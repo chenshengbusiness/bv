@@ -24,6 +24,7 @@ class VideoPlayerV3Activity : ComponentActivity() {
     companion object {
         private val logger = KotlinLogging.logger { }
         private var currentInstance: VideoPlayerV3Activity? = null
+        private var lastStartTime: Long = 0L
 
         fun actionStart(
             context: Context,
@@ -39,6 +40,13 @@ class VideoPlayerV3Activity : ComponentActivity() {
             proxyArea: ProxyArea = ProxyArea.MainLand,
             author: Author? = null
         ) {
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastStartTime < 1000) {
+                logger.info { "Ignore duplicate actionStart" }
+                return
+            }
+            lastStartTime = currentTime
+
             currentInstance?.finish()
             context.startActivity(
                 Intent(context, VideoPlayerV3Activity::class.java).apply {

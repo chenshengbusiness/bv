@@ -10,3 +10,10 @@
 /.idea/jarRepositories.xml
 /.idea/migrations.xml
 /.idea/codeStyles/
+
+# Ignored untracked files
+**/bin/
+.kotlin/
+*.keystore
+hs_err_pid*.log
+project_analysis.md

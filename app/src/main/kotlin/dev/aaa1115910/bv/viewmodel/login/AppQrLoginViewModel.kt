@@ -79,19 +79,22 @@ class AppQrLoginViewModel(
         logger.fInfo { "Check for login result" }
         runCatching {
             val qrLoginResult = loginRepository.checkAppQrLoginState(key)
-            withContext(Dispatchers.Main) { state = qrLoginResult.state }
-            when (state) {
+            val currentState = qrLoginResult.state
+            when (currentState) {
                 QrLoginState.WaitingForScan -> {
                     logger.fInfo { "Waiting to scan" }
+                    withContext(Dispatchers.Main) { state = currentState }
                 }
 
                 QrLoginState.WaitingForConfirm -> {
                     logger.fInfo { "Waiting to confirm" }
+                    withContext(Dispatchers.Main) { state = currentState }
                 }
 
                 QrLoginState.Expired -> {
                     logger.fInfo { "QR expired" }
                     timer.cancel()
+                    withContext(Dispatchers.Main) { state = currentState }
                 }
 
                 QrLoginState.Success -> {
@@ -110,10 +113,12 @@ class AppQrLoginViewModel(
                     userRepository.addUser(authData)
 
                     timer.cancel()
+                    withContext(Dispatchers.Main) { state = currentState }
                 }
 
                 else -> {
-                    logger.fInfo { "This state should not be here: $state" }
+                    logger.fInfo { "This state should not be here: $currentState" }
+                    withContext(Dispatchers.Main) { state = currentState }
                 }
             }
         }.onFailure {

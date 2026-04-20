@@ -227,9 +227,9 @@ object Prefs {
     )
     var firstPersonalTopNavItem by pref(
         PrefKeys.prefFirstPersonalTopNavItemKey,
-        PersonalTopNavItem.ToView,
+        PersonalTopNavItem.History,
         save = { it.ordinal },
-        restore = { PersonalTopNavItem.entries.getOrElse(it) { PersonalTopNavItem.ToView } }
+        restore = { PersonalTopNavItem.entries.getOrElse(it) { PersonalTopNavItem.History } }
     )
     var showHotword by pref(PrefKeys.prefShowHotwordKey, true)
 

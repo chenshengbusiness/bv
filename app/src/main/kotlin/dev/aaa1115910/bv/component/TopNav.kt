@@ -164,15 +164,15 @@ enum class PgcTopNavItem(private val pgcType: PgcType) : TopNavItem {
 }
 
 enum class PersonalTopNavItem : TopNavItem {
-    ToView,
     History,
+    ToView,
     Favorite,
     FollowingSeason;
 
     override fun getDisplayName(context: Context): String {
         return when (this) {
-            ToView -> "稍后再看"
             History -> "历史"
+            ToView -> "稍后再看"
             Favorite -> "收藏"
             FollowingSeason -> "我追的番"
         }
