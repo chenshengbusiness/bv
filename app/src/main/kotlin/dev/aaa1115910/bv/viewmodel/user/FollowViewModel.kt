@@ -43,8 +43,7 @@ class FollowViewModel(
                 preferApiType = Prefs.apiType
             )
             logger.fInfo { "Followed user count: ${followedUserList.size}" }
-            val sortedUserList = sortUsers(followedUserList)
-            followedUsers.swapListWithMainContext(sortedUserList)
+            followedUsers.swapListWithMainContext(followedUserList)
             logger.fInfo { "Load followed user finish" }
         }
         updating = false
