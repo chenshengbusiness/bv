@@ -126,16 +126,16 @@ android {
         }
     }
 
-    /*splits {
+    splits {
         if (gradle.startParameter.taskNames.find { it.startsWith("assembleDefault") } != null) {
             abi {
                 isEnable = true
                 reset()
-                include("x86_64", "x86", "arm64-v8a", "armeabi-v7a")
-                isUniversalApk = true
+                include("arm64-v8a", "armeabi-v7a")
+                isUniversalApk = false
             }
         }
-    }*/
+    }
 
     applicationVariants.configureEach {
         val variant = this

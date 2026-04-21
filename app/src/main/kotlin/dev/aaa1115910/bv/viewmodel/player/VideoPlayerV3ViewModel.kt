@@ -971,8 +971,10 @@ class VideoPlayerV3ViewModel(
             logger.info { "Load first subtitle" }
             logger.info { "availableSubtitle: ${_uiState.value.subtitleList.toList()}" }
             loadSubtitle(
-                _uiState.value.subtitleList
-                    .firstOrNull { it.id != -1L }?.id
+                _uiState.value.subtitleList.let { list ->
+                    list.firstOrNull { it.lang == "ai-zh" || it.langDoc.contains("AI") }
+                        ?: list.firstOrNull { it.id != -1L }
+                }?.id
                     ?: throw IllegalStateException("No available subtitle")
             )
         }.onFailure {
