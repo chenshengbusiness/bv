@@ -127,13 +127,11 @@ android {
     }
 
     splits {
-        if (gradle.startParameter.taskNames.find { it.startsWith("assembleDefault") } != null) {
-            abi {
-                isEnable = true
-                reset()
-                include("armeabi-v7a")
-                isUniversalApk = false
-            }
+        abi {
+            isEnable = true
+            reset()
+            include("arm64-v8a")//  include("armeabi-v7a") include("arm64-v8a")  include("arm64-v8a", "armeabi-v7a")
+            isUniversalApk = false
         }
     }
 
