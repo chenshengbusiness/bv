@@ -356,6 +356,7 @@ fun VideoPlayerController(
             fromSeason = fromSeason,
             danmakuEnabled = uiState.danmakuState.enabledTypes.isNotEmpty(),
             isLooping = isLooping,
+            isPlaying = isPlaying,
             onDirectionLeft = { onDirectionLeft() },
             onDirectionRight = { onDirectionRight() },
             onSeekGoTime = { onSeekGoTime() },

@@ -74,6 +74,7 @@ fun ControllerVideoInfo(
     fromSeason: Boolean,
     danmakuEnabled: Boolean,
     isLooping: Boolean,
+    isPlaying: Boolean,
     onDirectionLeft: () -> Unit,
     onDirectionRight: () -> Unit,
     onSeekGoTime: () -> Unit,
@@ -90,7 +91,7 @@ fun ControllerVideoInfo(
     ) {
         AnimatedVisibility(
             modifier = Modifier.align(Alignment.TopCenter),
-            visible = show,
+            visible = show || !isPlaying,
             enter = expandVertically(),
             exit = shrinkVertically(),
             label = "ControllerTopVideoInfo"
@@ -421,6 +422,7 @@ private fun ControllerVideoInfoPreview() {
             fromSeason = false,
             danmakuEnabled = false,
             isLooping = false,
+            isPlaying = false,
             onDirectionRight = {},
             onDirectionLeft = {},
             onSeekGoTime = {},
