@@ -163,6 +163,10 @@ fun VideoPlayerV3Screen(
         onCancelSkipToNextEp = {
             playerViewModel.cancelPlayNext()
         },
+        playNextCountdown = uiState.playNextCountdown,
+        onCancelPlayNext = {
+            playerViewModel.cancelPlayNext()
+        },
         onToggleLoop = {
             isLooping = !isLooping
         },

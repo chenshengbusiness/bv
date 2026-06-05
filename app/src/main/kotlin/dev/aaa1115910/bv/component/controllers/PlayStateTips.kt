@@ -1,5 +1,9 @@
 package dev.aaa1115910.bv.component.controllers
 
+import android.graphics.BitmapFactory
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,13 +12,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,6 +33,9 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
 import dev.aaa1115910.bv.ui.theme.BVTheme
+import io.github.g0dkar.qrcode.QRCode
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 
 @Composable
 fun PlayStateTips(
@@ -118,24 +130,87 @@ fun PlayErrorTip(
     modifier: Modifier = Modifier,
     errorMessage: String?
 ) {
+    val qrImage = remember(errorMessage) {
+        if (!errorMessage.isNullOrBlank()) {
+            try {
+                val output = ByteArrayOutputStream()
+                val content = if (errorMessage.length > 500) errorMessage.take(500) + "..." else errorMessage
+                QRCode(content).render().writeImage(output)
+                val input = ByteArrayInputStream(output.toByteArray())
+                BitmapFactory.decodeStream(input).asImageBitmap()
+            } catch (e: Exception) {
+                null
+            }
+        } else {
+            null
+        }
+    }
+
     Surface(
         modifier = modifier,
         colors = SurfaceDefaults.colors(
-            containerColor = Color.Black.copy(0.5f)
+            containerColor = Color.Black.copy(0.7f)
         ),
-        shape = MaterialTheme.shapes.medium
+        shape = MaterialTheme.shapes.large
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp, 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Row(
+            modifier = Modifier.padding(24.dp),
+            horizontalArrangement = Arrangement.spacedBy(24.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "播放器正在抽风",
-                style = MaterialTheme.typography.titleLarge
-            )
-            Text(text = " _(:з」∠)_")
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(text = "错误信息：${errorMessage ?: "未知错误"}")
+            Column(
+                modifier = Modifier.width(360.dp)
+            ) {
+                Text(
+                    text = "播放器正在抽风",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color.White
+                )
+                Text(
+                    text = " _(:з」∠)_",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "错误原因：",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White.copy(alpha = 0.8f)
+                )
+                Text(
+                    text = errorMessage ?: "未知错误",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.8f),
+                    maxLines = 6,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            qrImage?.let {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(160.dp)
+                            .clip(MaterialTheme.shapes.medium)
+                            .background(Color.White),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            bitmap = it,
+                            contentDescription = "Error QR Code",
+                            modifier = Modifier.size(140.dp)
+                        )
+                    }
+                    Text(
+                        text = "手机扫码复制完整错误",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color.White.copy(alpha = 0.6f)
+                    )
+                }
+            }
         }
     }
 }

@@ -18,6 +18,9 @@ class VideoInfoRepository(private val videoDetailRepository: VideoDetailReposito
     private val _videoList = MutableStateFlow<List<VideoListItem>>(emptyList())
     private val _videoDetailState = MutableStateFlow<VideoDetailState?>(null)
 
+    var lastPlayedAid: Long? = null
+    var isTodayUpdatePlayMode: Boolean = false
+
     val videoList = _videoList.asStateFlow()
     val videoDetailState = _videoDetailState.asStateFlow()
 
@@ -80,8 +83,11 @@ class VideoInfoRepository(private val videoDetailRepository: VideoDetailReposito
     }
 
     fun reset(){
+        if (isTodayUpdatePlayMode) return
         _videoList.update { emptyList() }
         _videoDetailState.update { null }
+        lastPlayedAid = null
+        isTodayUpdatePlayMode = false
     }
 
     private fun mapToVideoCardData(relatedVideos:List<RelatedVideo>): List<VideoCardData> {

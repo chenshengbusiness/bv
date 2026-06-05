@@ -59,7 +59,7 @@ fun ClosedCaptionMenuList(
     val restorerFocusRequester = remember { FocusRequester() }
 
     val focusRequester = remember { FocusRequester() }
-    var selectedClosedCaptionMenuItem by remember { mutableStateOf(VideoPlayerClosedCaptionMenuItem.Switch) }
+    var selectedClosedCaptionMenuItem by remember { mutableStateOf(VideoPlayerClosedCaptionMenuItem.Size) }
 
     Row(
         modifier = modifier.fillMaxHeight(),
@@ -70,21 +70,7 @@ fun ClosedCaptionMenuList(
             .padding(horizontal = 8.dp)
         AnimatedVisibility(visible = focusState.focusState != MenuFocusState.MenuNav) {
             when (selectedClosedCaptionMenuItem) {
-                VideoPlayerClosedCaptionMenuItem.Switch -> RadioMenuList(
-                    modifier = menuItemsModifier,
-                    items = availableSubtitleTracks.map {
-                        it.langDoc
-                            .replace("（自动生成）", "")
-                            .replace("（自动翻译）", "")
-                            .trim() + if (it.type == SubtitleType.AI) "(AI)" else ""
-                    },
-                    selected = availableSubtitleTracks.indexOfFirst { it.id == currentSubtitleId },
-                    onSelectedChanged = { onSubtitleChange(availableSubtitleTracks[it]) },
-                    onFocusBackToParent = {
-                        onFocusStateChange(MenuFocusState.Menu)
-                        focusRequester.requestFocus()
-                    },
-                )
+                VideoPlayerClosedCaptionMenuItem.Switch -> {}
 
                 VideoPlayerClosedCaptionMenuItem.Size -> StepLessMenuItem(
                     modifier = menuItemsModifier,
@@ -142,7 +128,8 @@ fun ClosedCaptionMenuList(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(8.dp)
         ) {
-            itemsIndexed(VideoPlayerClosedCaptionMenuItem.entries) { index, item ->
+            val styleItems = VideoPlayerClosedCaptionMenuItem.entries.filter { it != VideoPlayerClosedCaptionMenuItem.Switch }
+            itemsIndexed(styleItems) { index, item ->
                 MenuListItem(
                     modifier = Modifier
                         .ifElse(index == 0, Modifier.focusRequester(restorerFocusRequester)),
@@ -153,5 +140,38 @@ fun ClosedCaptionMenuList(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun SubtitleSwitchMenuList(
+    modifier: Modifier = Modifier,
+    currentSubtitleId: Long,
+    availableSubtitleTracks: List<Subtitle>,
+    onSubtitleChange: (Subtitle) -> Unit,
+    onFocusStateChange: (MenuFocusState) -> Unit
+) {
+    val menuItemsModifier = Modifier
+        .width(216.dp)
+        .padding(horizontal = 8.dp)
+
+    Row(
+        modifier = modifier.fillMaxHeight(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioMenuList(
+            modifier = menuItemsModifier,
+            items = availableSubtitleTracks.map {
+                it.langDoc
+                    .replace("（自动生成）", "")
+                    .replace("（自动翻译）", "")
+                    .trim() + if (it.type == SubtitleType.AI) "(AI)" else ""
+            },
+            selected = availableSubtitleTracks.indexOfFirst { it.id == currentSubtitleId },
+            onSelectedChanged = { onSubtitleChange(availableSubtitleTracks[it]) },
+            onFocusBackToParent = {
+                onFocusStateChange(MenuFocusState.MenuNav)
+            },
+        )
     }
 }

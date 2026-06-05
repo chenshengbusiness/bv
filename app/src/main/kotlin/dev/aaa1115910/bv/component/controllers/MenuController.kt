@@ -52,6 +52,7 @@ import dev.aaa1115910.biliapi.entity.video.SubtitleAiType
 import dev.aaa1115910.biliapi.entity.video.SubtitleType
 import dev.aaa1115910.bv.R
 import dev.aaa1115910.bv.component.controllers.playermenu.ClosedCaptionMenuList
+import dev.aaa1115910.bv.component.controllers.playermenu.SubtitleSwitchMenuList
 import dev.aaa1115910.bv.component.controllers.playermenu.DanmakuMenuList
 import dev.aaa1115910.bv.component.controllers.playermenu.MenuNavList
 import dev.aaa1115910.bv.component.controllers.playermenu.PictureMenuList
@@ -145,7 +146,7 @@ fun MenuController(
     onSubtitleBackgroundOpacityChange: (Float) -> Unit,
     onSubtitleBottomPadding: (Dp) -> Unit
 ) {
-    var selectedNavItem by remember { mutableStateOf(VideoPlayerMenuNavItem.PlaySpeed) }
+    var selectedNavItem by remember { mutableStateOf(VideoPlayerMenuNavItem.ClosedCaption) }
     var focusState by remember { mutableStateOf(MenuFocusState.MenuNav) }
 
     Surface(
@@ -276,6 +277,29 @@ private fun MenuList(
             }
 
             VideoPlayerMenuNavItem.ClosedCaption -> {
+                SubtitleSwitchMenuList(
+                    currentSubtitleId = uiState.subtitleId,
+                    availableSubtitleTracks = buildList {
+                        add(
+                            Subtitle(
+                                id = -1,
+                                lang = "",
+                                langDoc = "关闭",
+                                url = "",
+                                type = SubtitleType.CC,
+                                aiType = SubtitleAiType.Normal,
+                                aiStatus = SubtitleAiStatus.None
+                            )
+                        )
+                        addAll(uiState.subtitleList)
+                        sortBy { it.id }
+                    },
+                    onSubtitleChange = onSubtitleChange,
+                    onFocusStateChange = onFocusStateChange,
+                )
+            }
+
+            VideoPlayerMenuNavItem.SubtitleStyle -> {
                 ClosedCaptionMenuList(
                     currentSubtitleId = uiState.subtitleId,
                     availableSubtitleTracks = buildList {
@@ -309,10 +333,11 @@ private fun MenuList(
 
 
 enum class VideoPlayerMenuNavItem(private val strRes: Int, val icon: ImageVector) {
+    ClosedCaption(R.string.player_controller_menu_item_subtitle, Icons.Outlined.ClosedCaption),
     PlaySpeed(R.string.video_player_menu_picture_play_speed, Icons.Outlined.Speed),
     Picture(R.string.video_player_menu_nav_picture, Icons.Outlined.Image),
     Danmaku(R.string.video_player_menu_nav_danmaku, Icons.Outlined.ClearAll),
-    ClosedCaption(R.string.video_player_menu_nav_subtitle, Icons.Outlined.ClosedCaption);
+    SubtitleStyle(R.string.video_player_menu_nav_subtitle, Icons.Outlined.ClosedCaption);
 
     fun getDisplayName(context: Context) = context.getString(strRes)
 }

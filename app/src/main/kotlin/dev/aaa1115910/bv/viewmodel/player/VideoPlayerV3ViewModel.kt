@@ -189,6 +189,7 @@ class VideoPlayerV3ViewModel(
         authorMid: Long = 0,
         authorName: String
     ) {
+        videoInfoRepository.lastPlayedAid = aid
         _uiState.update {
             it.copy(
                 aid = aid,
@@ -518,7 +519,7 @@ class VideoPlayerV3ViewModel(
 
     fun cancelPlayNext() {
         playNextCountdownJob?.cancel()
-        _uiState.update { it.copy(showSkipToNextEp = false) }
+        _uiState.update { it.copy(showSkipToNextEp = false, playNextCountdown = -1) }
     }
 
     fun backToStart() {
@@ -555,6 +556,7 @@ class VideoPlayerV3ViewModel(
     }
 
     fun playNewVideo(newVideo: VideoListItem) {
+        videoInfoRepository.lastPlayedAid = newVideo.aid
         videoPlayer?.pause()
 
         val state = _uiState.value
@@ -1178,12 +1180,15 @@ class VideoPlayerV3ViewModel(
             _uiState.update {
                 it.copy(
                     showSkipToNextEp = true,
+                    playNextCountdown = 3
                 )
             }
-            delay(5000)
-
+            for (i in 3 downTo 1) {
+                _uiState.update { it.copy(playNextCountdown = i) }
+                delay(1000)
+            }
+            _uiState.update { it.copy(playNextCountdown = -1, showSkipToNextEp = false) }
             playNextTarget(target)
-            _uiState.update { it.copy(showSkipToNextEp = false) }
         }
     }
 

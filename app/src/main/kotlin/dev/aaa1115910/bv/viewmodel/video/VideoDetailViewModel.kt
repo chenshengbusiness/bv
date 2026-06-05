@@ -118,6 +118,7 @@ class VideoDetailViewModel(
     }
 
     fun updateVideoList(sectionIndex: Int) {
+        if (videoInfoRepository.isTodayUpdatePlayMode) return
         val videoDetail = _uiState.value.videoDetailState ?: return
 
         val partVideoList =
@@ -132,6 +133,7 @@ class VideoDetailViewModel(
     }
 
     fun updateVideoList(videoListItem: List<VideoListItem>) {
+        if (videoInfoRepository.isTodayUpdatePlayMode) return
         videoInfoRepository.updateVideoList(videoListItem)
     }
 

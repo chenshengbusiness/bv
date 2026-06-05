@@ -2,7 +2,10 @@ package dev.aaa1115910.bv.component.controllers
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -26,7 +29,10 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.Surface
+import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
 import dev.aaa1115910.biliapi.entity.video.Subtitle
 import dev.aaa1115910.bv.BuildConfig
@@ -84,6 +90,8 @@ fun VideoPlayerController(
     onSubtitleChange: (Subtitle) -> Unit,
     onSubtitleSettingChange: (SubtitleSettingAction) -> Unit,
     onRelatedVideoClicked: (VideoCardData) -> Unit,
+    playNextCountdown: Int = -1,
+    onCancelPlayNext: () -> Unit = {},
 
     content: @Composable () -> Unit
 ) {
@@ -185,6 +193,11 @@ fun VideoPlayerController(
 
         when (event.key) {
             Key.Back -> {
+                if (playNextCountdown > 0) {
+                    onCancelPlayNext()
+                    onExit()
+                    return true
+                }
                 if (showClickableControllers) {
                     showMenuController = false
                     showListController = false
@@ -447,6 +460,61 @@ fun VideoPlayerController(
                 onSubtitleSettingChange(SubtitleSettingAction.SetBottomPadding(padding))
             }
         )
+        if (playNextCountdown > 0) {
+            PlayNextCountdownOverlay(
+                seconds = playNextCountdown,
+                onCancel = {
+                    onCancelPlayNext()
+                    onExit()
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun PlayNextCountdownOverlay(
+    modifier: Modifier = Modifier,
+    seconds: Int,
+    onCancel: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.6f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
+            colors = SurfaceDefaults.colors(
+                containerColor = Color.Black.copy(alpha = 0.5f)
+            ),
+            shape = MaterialTheme.shapes.large,
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "即将播放下一集",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color.White
+                )
+
+                Text(
+                    text = seconds.toString(),
+                    style = MaterialTheme.typography.displayLarge.copy(fontSize = 72.sp),
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Text(
+                    text = "按 [返回键] 取消并退出",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.7f)
+                )
+            }
+        }
     }
 }
 

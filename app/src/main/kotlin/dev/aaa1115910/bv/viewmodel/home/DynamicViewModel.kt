@@ -12,6 +12,7 @@ import dev.aaa1115910.bv.BVApp
 import dev.aaa1115910.bv.BuildConfig
 import dev.aaa1115910.bv.R
 import dev.aaa1115910.bv.util.Prefs
+import dev.aaa1115910.bv.repository.VideoInfoRepository
 import dev.aaa1115910.bv.util.addAllWithMainContext
 import dev.aaa1115910.bv.util.fInfo
 import dev.aaa1115910.bv.util.fWarn
@@ -25,7 +26,8 @@ import org.koin.android.annotation.KoinViewModel
 @KoinViewModel
 class DynamicViewModel(
     private val bvUserRepository: BvUserRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val videoInfoRepository: VideoInfoRepository
 ) : ViewModel() {
     private val logger = KotlinLogging.logger {}
     val dynamicList = mutableStateListOf<DynamicVideo>()
@@ -101,5 +103,28 @@ class DynamicViewModel(
         loading = false
         hasMore = true
         historyOffset = null
+    }
+
+    val lastPlayedAid get() = videoInfoRepository.lastPlayedAid
+
+    fun clearLastPlayedAid() {
+        videoInfoRepository.lastPlayedAid = null
+        videoInfoRepository.isTodayUpdatePlayMode = false
+    }
+
+    fun playTodayVideos(startVideo: DynamicVideo) {
+        val todayVideos = dynamicList.filter {
+            val time = it.pubTime ?: ""
+            time.contains("刚刚") || time.contains("分钟前") || time.contains("小时前") || time.contains("今天")
+        }
+        val videoListItems = todayVideos.map {
+            dev.aaa1115910.bv.entity.VideoListItem(
+                aid = it.aid,
+                cid = it.cid,
+                title = it.title
+            )
+        }
+        videoInfoRepository.updateVideoList(videoListItems)
+        videoInfoRepository.isTodayUpdatePlayMode = true
     }
 }

@@ -20,6 +20,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import kotlinx.coroutines.delay
 import androidx.tv.material3.Text
 import dev.aaa1115910.biliapi.entity.user.DynamicVideo
 import dev.aaa1115910.bv.activities.video.UpInfoActivity
@@ -50,14 +53,33 @@ fun DynamicsScreen(
     val gridState = rememberLazyGridState()   // 直接用 LazyVerticalGrid
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val focusRequesterMap = remember { mutableMapOf<Long, FocusRequester>() }
 
     val onClickVideo: (DynamicVideo) -> Unit = { dynamic ->
+        val time = dynamic.pubTime ?: ""
+        val isToday = time.contains("刚刚") || time.contains("分钟前") || time.contains("小时前") || time.contains("今天")
+        if (isToday) {
+            dynamicViewModel.playTodayVideos(dynamic)
+        }
         VideoInfoActivity.actionStart(
             context = context,
             aid = dynamic.aid,
             epid = dynamic.epid,
             proxyArea = ProxyArea.checkProxyArea(dynamic.title)
         )
+    }
+
+    LaunchedEffect(dynamicViewModel.lastPlayedAid) {
+        val lastPlayedAid = dynamicViewModel.lastPlayedAid
+        if (lastPlayedAid != null) {
+            val index = dynamicViewModel.dynamicList.indexOfFirst { it.aid == lastPlayedAid }
+            if (index != -1) {
+                gridState.scrollToItem(index)
+                delay(150)
+                focusRequesterMap[lastPlayedAid]?.requestFocus()
+            }
+            dynamicViewModel.clearLastPlayedAid()
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -97,7 +119,9 @@ fun DynamicsScreen(
                 items = dynamicViewModel.dynamicList,
                 key = { index, _ -> index }
             ) { _, item ->
+                val itemRequester = remember(item.aid) { focusRequesterMap.getOrPut(item.aid) { FocusRequester() } }
                 SmallVideoCard(
+                    modifier = Modifier.focusRequester(itemRequester),
                     data = remember(item) {         // `VideoCardData` 只在 item 变动时重建
                         VideoCardData(
                             avid = item.aid,
