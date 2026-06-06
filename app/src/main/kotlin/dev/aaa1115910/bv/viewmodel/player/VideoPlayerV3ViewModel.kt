@@ -617,7 +617,20 @@ class VideoPlayerV3ViewModel(
         loadVideoJob?.cancel()
         loadVideoJob = viewModelScope.launch(Dispatchers.IO) {
             try {
-                resolveUrlsAndPlay(avid, cid, epid)
+                var targetCid = cid
+                if (targetCid == 0L) {
+                    logger.info { "Cid is 0, loading video detail for aid $avid..." }
+                    videoInfoRepository.loadVideoDetail(avid, Prefs.apiType)
+                    val detail = videoInfoRepository.videoDetailState.value
+                    if (detail != null && detail.aid == avid) {
+                        targetCid = detail.cid
+                        _uiState.update { it.copy(cid = targetCid) }
+                    } else {
+                        throw IllegalStateException("无法获取视频的 CID")
+                    }
+                }
+
+                resolveUrlsAndPlay(avid, targetCid, epid)
 
                 launch {
                     updateSubtitle()
@@ -627,7 +640,7 @@ class VideoPlayerV3ViewModel(
                         enableFirstSubtitle()
                     }
                 }
-                launch { loadDanmaku(cid) }
+                launch { loadDanmaku(targetCid) }
                 launch { updateDanmakuMask() }
                 launch { updateVideoShot() }
                 launch { updateVideoPages() }

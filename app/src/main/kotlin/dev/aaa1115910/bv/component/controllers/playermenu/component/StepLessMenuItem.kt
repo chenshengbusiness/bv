@@ -33,6 +33,7 @@ fun StepLessMenuItem(
         modifier = modifier
             .fillMaxHeight()
             .onPreviewKeyEvent {
+                if (it.key == Key.Back) return@onPreviewKeyEvent false
                 println(it)
                 if (it.type == KeyEventType.KeyUp) return@onPreviewKeyEvent true
                 if (it.key == Key.DirectionRight) onFocusBackToParent()
@@ -95,6 +96,7 @@ fun StepLessMenuItem(
         modifier = modifier
             .fillMaxHeight()
             .onPreviewKeyEvent {
+                if (it.key == Key.Back) return@onPreviewKeyEvent false
                 println(it)
                 if (it.type == KeyEventType.KeyUp) return@onPreviewKeyEvent true
                 if (it.key == Key.DirectionRight) onFocusBackToParent()

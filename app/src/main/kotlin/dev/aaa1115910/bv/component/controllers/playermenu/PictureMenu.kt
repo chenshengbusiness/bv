@@ -132,6 +132,7 @@ fun PictureMenuList(
                 .focusRequester(focusRequester)
                 .padding(horizontal = 8.dp)
                 .onPreviewKeyEvent {
+                    if (it.key == Key.Back) return@onPreviewKeyEvent false
                     if (it.type == KeyEventType.KeyUp) {
                         if (listOf(Key.Enter, Key.DirectionCenter).contains(it.key)) {
                             return@onPreviewKeyEvent false
