@@ -46,6 +46,7 @@ data class PlayerUiState(
     val showBackToStart: Boolean = false,
     val showPreviewTip: Boolean = false,
     val playNextCountdown: Int = -1,
+    val nextVideoTitle: String = "",
 
     // 播放器配置与资源
     val availableQuality: Map<Int, String> = emptyMap(),

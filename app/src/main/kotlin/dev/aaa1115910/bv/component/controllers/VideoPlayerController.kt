@@ -338,6 +338,8 @@ fun VideoPlayerController(
             showBackToStart = uiState.showBackToStart,
             showSkipToNextEp = uiState.showSkipToNextEp,
             showPreviewTip = uiState.showPreviewTip,
+            playNextCountdown = uiState.playNextCountdown,
+            nextVideoTitle = uiState.nextVideoTitle,
         )
 
         PlayStateTips(

@@ -450,33 +450,36 @@ class VideoPlayerV3ViewModel(
      * 触发播放结束后的检查逻辑
      */
     fun checkAndPlayNext() {
-        when (Prefs.actionAfterPlay) {
-            ActionAfterPlayItems.Pause -> return
-            ActionAfterPlayItems.Exit -> {
-                viewModelScope.launch {
-                    _uiEffect.emit(PlayerUiEffect.FinishActivity)
-                }
+        val shouldForcePlayNext = videoInfoRepository.isTodayUpdatePlayMode
+        if (!shouldForcePlayNext) {
+            when (Prefs.actionAfterPlay) {
+                ActionAfterPlayItems.Pause -> return
+                ActionAfterPlayItems.Exit -> {
+                    viewModelScope.launch {
+                        _uiEffect.emit(PlayerUiEffect.FinishActivity)
+                    }
 
-                return
-            }
-
-            ActionAfterPlayItems.PlayRelated -> {
-                val firstRelatedVideo = _uiState.value.relatedVideos.firstOrNull()
-                firstRelatedVideo?.cid?.let {
-                    val nextVideo = VideoListItem(
-                        aid = firstRelatedVideo.avid,
-                        cid = firstRelatedVideo.cid,
-                        title = firstRelatedVideo.title
-                    )
-                    playNewVideo(newVideo = nextVideo)
-
-                    // 因为番剧无相关视频，需要继续播放，所以在这里return
                     return
                 }
-            }
 
-            ActionAfterPlayItems.PlayNext -> {
-                /* 继续执行 */
+                ActionAfterPlayItems.PlayRelated -> {
+                    val firstRelatedVideo = _uiState.value.relatedVideos.firstOrNull()
+                    firstRelatedVideo?.cid?.let {
+                        val nextVideo = VideoListItem(
+                            aid = firstRelatedVideo.avid,
+                            cid = firstRelatedVideo.cid,
+                            title = firstRelatedVideo.title
+                        )
+                        playNewVideo(newVideo = nextVideo)
+
+                        // 因为番剧无相关视频，需要继续播放，所以在这里return
+                        return
+                    }
+                }
+
+                ActionAfterPlayItems.PlayNext -> {
+                    /* 继续执行 */
+                }
             }
         }
 
@@ -519,7 +522,7 @@ class VideoPlayerV3ViewModel(
 
     fun cancelPlayNext() {
         playNextCountdownJob?.cancel()
-        _uiState.update { it.copy(showSkipToNextEp = false, playNextCountdown = -1) }
+        _uiState.update { it.copy(showSkipToNextEp = false, playNextCountdown = -1, nextVideoTitle = "") }
     }
 
     fun backToStart() {
@@ -650,7 +653,7 @@ class VideoPlayerV3ViewModel(
                 logger.error(e) { "Loading video data error: $e" }
 
                 _uiState.update {
-                    it.copy(playerState = PlayerState.Error(e.message ?: "未知错误"))
+                    it.copy(playerState = PlayerState.Error(e.stackTraceToString()))
                 }
             }
         }
@@ -1193,14 +1196,15 @@ class VideoPlayerV3ViewModel(
             _uiState.update {
                 it.copy(
                     showSkipToNextEp = true,
-                    playNextCountdown = 3
+                    playNextCountdown = 3,
+                    nextVideoTitle = target.title
                 )
             }
             for (i in 3 downTo 1) {
                 _uiState.update { it.copy(playNextCountdown = i) }
                 delay(1000)
             }
-            _uiState.update { it.copy(playNextCountdown = -1, showSkipToNextEp = false) }
+            _uiState.update { it.copy(playNextCountdown = -1, showSkipToNextEp = false, nextVideoTitle = "") }
             playNextTarget(target)
         }
     }

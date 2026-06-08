@@ -41,6 +41,8 @@ fun SkipTips(
     showBackToStart: Boolean,
     showSkipToNextEp: Boolean,
     showPreviewTip: Boolean,
+    playNextCountdown: Int = -1,
+    nextVideoTitle: String = "",
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         // Column 自动管理堆叠，出现/消失时其他 tip 平滑移动
@@ -55,9 +57,18 @@ fun SkipTips(
                 text = "视频需付费，当前为试看片段",
                 icon = Icons.Outlined.Info,
             )
+            val skipText = buildString {
+                append("播放结束，即将播放下一集")
+                if (nextVideoTitle.isNotEmpty()) {
+                    append("：$nextVideoTitle")
+                }
+                if (playNextCountdown > 0) {
+                    append(" (${playNextCountdown}s)")
+                }
+            }
             PlayerTip(
                 show = showSkipToNextEp,
-                text = "播放结束，即将播放下一集",
+                text = skipText,
                 icon = Icons.Outlined.SkipNext,
             )
             PlayerTip(

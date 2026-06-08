@@ -134,7 +134,7 @@ fun PlayErrorTip(
         if (!errorMessage.isNullOrBlank()) {
             try {
                 val output = ByteArrayOutputStream()
-                val content = if (errorMessage.length > 500) errorMessage.take(500) + "..." else errorMessage
+                val content = if (errorMessage.length > 1200) errorMessage.take(1200) + "..." else errorMessage
                 QRCode(content).render().writeImage(output)
                 val input = ByteArrayInputStream(output.toByteArray())
                 BitmapFactory.decodeStream(input).asImageBitmap()

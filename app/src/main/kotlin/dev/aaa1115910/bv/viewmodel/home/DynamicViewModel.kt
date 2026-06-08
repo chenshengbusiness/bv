@@ -123,7 +123,7 @@ class DynamicViewModel(
                 cid = it.cid,
                 title = it.title
             )
-        }
+        }.reversed()
         videoInfoRepository.updateVideoList(videoListItems)
         videoInfoRepository.isTodayUpdatePlayMode = true
     }
