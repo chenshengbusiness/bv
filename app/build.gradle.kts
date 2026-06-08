@@ -2,6 +2,8 @@
 
 import com.android.build.gradle.internal.api.ApkVariantOutputImpl
 import java.io.FileInputStream
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Properties
 
 plugins {
@@ -139,9 +141,13 @@ android {
         val variant = this
         outputs.configureEach {
             (this as ApkVariantOutputImpl).apply {
-                val abi = this.filters.find { it.filterType == "ABI" }?.identifier ?: "universal"
-                outputFileName =
-                    "BV_${AppConfiguration.versionCode}_${AppConfiguration.versionName}.${variant.buildType.name}_${variant.flavorName}_$abi.apk"
+                val date = SimpleDateFormat("yyyyMMdd").format(Date())
+                if (variant.buildType.name == "release" && variant.flavorName == "default") {
+                    outputFileName = "BV_${date}.apk"
+                } else {
+                    val abi = this.filters.find { it.filterType == "ABI" }?.identifier ?: "universal"
+                    outputFileName = "BV_${date}_${variant.buildType.name}_${variant.flavorName}_$abi.apk"
+                }
                 versionNameOverride =
                     "${variant.versionName}.${variant.buildType.name}"
             }
