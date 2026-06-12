@@ -126,7 +126,8 @@ class VideoDetailViewModel(
                 VideoListItem(
                     aid = episode.aid,
                     cid = episode.cid,
-                    title = episode.title
+                    title = episode.title,
+                    cover = episode.cover
                 )
             }
         videoInfoRepository.updateVideoList(partVideoList ?: emptyList())

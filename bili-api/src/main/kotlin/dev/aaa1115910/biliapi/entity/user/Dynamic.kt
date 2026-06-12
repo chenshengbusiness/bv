@@ -65,6 +65,7 @@ data class DynamicVideo(
     val play: Int,
     val danmaku: Int,
     val pubTime: String? = null,
+    val badge: String? = null,
 ) {
     companion object {
         fun fromDynamicVideoItem(item: dev.aaa1115910.biliapi.http.entity.dynamic.DynamicItem): DynamicVideo {
@@ -82,7 +83,8 @@ data class DynamicVideo(
                 duration = convertStringTimeToSeconds(archive.durationText),
                 play = convertStringPlayCountToNumberPlayCount(archive.stat.play),
                 danmaku = convertStringPlayCountToNumberPlayCount(archive.stat.danmaku),
-                pubTime = author.pubTime
+                pubTime = author.pubTime,
+                badge = archive.badge?.text
             )
         }
 
@@ -109,7 +111,8 @@ data class DynamicVideo(
                         duration = convertStringTimeToSeconds(archive.coverLeftText1),
                         play = convertStringPlayCountToNumberPlayCount(archive.coverLeftText2),
                         danmaku = convertStringPlayCountToNumberPlayCount(archive.coverLeftText3),
-                        pubTime = author.ptimeLabelText.substringBefore(" ")
+                        pubTime = author.ptimeLabelText.substringBefore(" "),
+                        badge = null
                     )
                 }
 
@@ -128,7 +131,8 @@ data class DynamicVideo(
                         duration = convertStringTimeToSeconds(pgc.coverLeftText1),
                         play = convertStringPlayCountToNumberPlayCount(pgc.coverLeftText2),
                         danmaku = convertStringPlayCountToNumberPlayCount(pgc.coverLeftText3),
-                        pubTime = author.ptimeLabelText.substringBefore(" ")
+                        pubTime = author.ptimeLabelText.substringBefore(" "),
+                        badge = null
                     )
                 }
 

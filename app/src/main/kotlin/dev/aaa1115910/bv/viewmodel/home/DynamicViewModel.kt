@@ -121,7 +121,8 @@ class DynamicViewModel(
             dev.aaa1115910.bv.entity.VideoListItem(
                 aid = it.aid,
                 cid = it.cid,
-                title = it.title
+                title = it.title,
+                cover = it.cover
             )
         }.reversed()
         videoInfoRepository.updateVideoList(videoListItems)

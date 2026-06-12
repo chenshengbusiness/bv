@@ -204,7 +204,7 @@ data class DynamicItem(
                 @Serializable
                 data class Archive(
                     val aid: String,
-                    val badge: Badge,
+                    val badge: Badge? = null,
                     val bvid: String,
                     val cover: String,
                     val desc: String,

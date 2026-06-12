@@ -200,26 +200,51 @@ fun VideoInfoScreen(
         val videoDetailState = uiState.videoDetailState ?: return
         val targetCid = cid ?: videoDetailState.cid
 
-        // 1. 更新播放列表
-        videoDetailViewModel.updateVideoList(
-            listOf(
-                VideoListItem(
-                    aid = videoDetailState.aid,
-                    cid = targetCid,
-                    title = videoDetailState.title,
+        val ugcSeason = videoDetailState.ugcSeason
+        var targetTitle = videoDetailState.title
+        var partTitle = videoDetailState.pages.find { it.cid == targetCid }?.title
+            ?: videoDetailState.pages.firstOrNull()?.title ?: ""
+
+        if (ugcSeason != null) {
+            val sectionIndex = ugcSeason.sections.indexOfFirst { section ->
+                section.episodes.any { it.aid == videoDetailState.aid }
+            }
+            if (sectionIndex != -1) {
+                videoDetailViewModel.updateVideoList(sectionIndex)
+                val currentEpisode = ugcSeason.sections[sectionIndex].episodes.find { it.aid == videoDetailState.aid }
+                if (currentEpisode != null) {
+                    targetTitle = currentEpisode.title
+                    partTitle = currentEpisode.title
+                }
+            } else {
+                videoDetailViewModel.updateVideoList(
+                    listOf(
+                        VideoListItem(
+                            aid = videoDetailState.aid,
+                            cid = targetCid,
+                            title = videoDetailState.title,
+                            cover = videoDetailState.cover
+                        )
+                    )
+                )
+            }
+        } else {
+            videoDetailViewModel.updateVideoList(
+                listOf(
+                    VideoListItem(
+                        aid = videoDetailState.aid,
+                        cid = targetCid,
+                        title = videoDetailState.title,
+                        cover = videoDetailState.cover
+                    )
                 )
             )
-        )
+        }
 
-        // 2. 解析分集标题
-        val partTitle = videoDetailState.pages.find { it.cid == targetCid }?.title
-            ?: videoDetailState.pages.first().title
-
-        // 3. 统一调用
         performLaunchPlayer(
             targetAid = videoDetailState.aid,
             targetCid = targetCid,
-            targetTitle = videoDetailState.title,
+            targetTitle = targetTitle,
             targetPartTitle = partTitle,
             isFromSeason = uiState.fromSeason
         )

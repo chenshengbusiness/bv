@@ -154,7 +154,8 @@ fun SmallVideoCard(
                     cover = data.cover,
                     play = data.playString,
                     danmaku = data.danmakuString,
-                    time = data.timeString
+                    time = data.timeString,
+                    badge = data.badge
                 )
             }
         }
@@ -175,7 +176,8 @@ fun CardCover(
     cover: String,
     play: String,
     danmaku: String,
-    time: String
+    time: String,
+    badge: String? = null
 ) {
     Box(
         modifier = modifier
@@ -191,6 +193,23 @@ fun CardCover(
             contentDescription = null,
             contentScale = ContentScale.Crop
         )
+
+        if (!badge.isNullOrBlank()) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .clip(MaterialTheme.shapes.extraSmall)
+                    .background(Color(0xFFF0743F))
+                    .padding(horizontal = 6.dp, vertical = 2.dp)
+            ) {
+                Text(
+                    text = badge,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White
+                )
+            }
+        }
 
         // 渐变遮罩
         Box(

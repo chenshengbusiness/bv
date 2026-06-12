@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
 
 @Composable
 fun SkipTips(
@@ -43,6 +45,8 @@ fun SkipTips(
     showPreviewTip: Boolean,
     playNextCountdown: Int = -1,
     nextVideoTitle: String = "",
+    showNextVideoPreview: Boolean = false,
+    nextVideoCover: String? = null,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         // Column 自动管理堆叠，出现/消失时其他 tip 平滑移动
@@ -58,7 +62,7 @@ fun SkipTips(
                 icon = Icons.Outlined.Info,
             )
             val skipText = buildString {
-                append("播放结束，即将播放下一集")
+                append("即将播放下一集")
                 if (nextVideoTitle.isNotEmpty()) {
                     append("：$nextVideoTitle")
                 }
@@ -67,9 +71,10 @@ fun SkipTips(
                 }
             }
             PlayerTip(
-                show = showSkipToNextEp,
+                show = showSkipToNextEp || showNextVideoPreview,
                 text = skipText,
                 icon = Icons.Outlined.SkipNext,
+                coverUrl = nextVideoCover
             )
             PlayerTip(
                 show = showBackToStart,
@@ -85,6 +90,7 @@ fun PlayerTip(
     show: Boolean,
     text: String,
     icon: ImageVector,
+    coverUrl: String? = null,
 ) {
     AnimatedVisibility(
         visible = show,
@@ -112,11 +118,22 @@ fun PlayerTip(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
+                if (!coverUrl.isNullOrBlank()) {
+                    AsyncImage(
+                        model = coverUrl,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(width = 80.dp, height = 45.dp)
+                            .clip(RoundedCornerShape(4.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
                 Text(
                     text = text,
                     style = MaterialTheme.typography.titleLarge,

@@ -353,7 +353,8 @@ fun SeasonInfoScreen(
                                         seasonId = seasonData?.seasonId,
                                         title = runCatching {
                                             "第 ${episode.title.toInt()} 集"
-                                        }.getOrDefault(episode.title) + " " + episode.longTitle
+                                        }.getOrDefault(episode.title) + " " + episode.longTitle,
+                                        cover = episode.cover
                                     )
                                 }
                                 videoInfoRepository.updateVideoList(partVideoList)
@@ -422,7 +423,8 @@ fun SeasonInfoScreen(
                                             seasonId = seasonData?.seasonId,
                                             title = runCatching {
                                                 "第 ${episode.title.toInt()} 集"
-                                            }.getOrDefault(episode.title) + " " + episode.longTitle
+                                            }.getOrDefault(episode.title) + " " + episode.longTitle,
+                                            cover = episode.cover
                                         )
                                     } ?: emptyList()
                                 videoInfoRepository.updateVideoList(partVideoList)
@@ -448,7 +450,8 @@ fun SeasonInfoScreen(
                                         seasonId = seasonData?.seasonId,
                                         title = runCatching {
                                             "第 ${episode.title.toInt()} 集"
-                                        }.getOrDefault(episode.title) + " " + episode.longTitle
+                                        }.getOrDefault(episode.title) + " " + episode.longTitle,
+                                        cover = episode.cover
                                     )
                                 }
                                 videoInfoRepository.updateVideoList(partVideoList)

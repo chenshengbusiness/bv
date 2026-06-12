@@ -133,6 +133,8 @@ class VideoPlayerV3ViewModel(
 
             updatePlaySpeed(forceUpdate = true)
             startSeekerUpdater()
+
+            calculateNextPlayTarget()
         }
 
         override fun onPlay() {
@@ -520,9 +522,52 @@ class VideoPlayerV3ViewModel(
         }
     }
 
+    private fun calculateNextPlayTarget() {
+        val currentState = _uiState.value
+        val videoList = currentState.availableVideoList
+        val currentCid = currentState.cid
+
+        // 1. 查找当前视频在列表中的位置
+        val videoListIndex = videoList.indexOfFirst { it.aid == currentState.aid }
+        val currentVideoItem = videoList.getOrNull(videoListIndex)
+
+        // 2. 预计算下一个播放项
+        var nextTarget: NextPlayTarget? = null
+
+        // 逻辑 A: 检查是否有下一个分 P (UGC Page)
+        if (currentVideoItem?.ugcPages?.isNotEmpty() == true) {
+            val currentInnerIndex = currentVideoItem.ugcPages.indexOfFirst { it.cid == currentCid }
+            if (currentInnerIndex != -1 && currentInnerIndex + 1 < currentVideoItem.ugcPages.size) {
+                val nextPage = currentVideoItem.ugcPages[currentInnerIndex + 1]
+                nextTarget = NextPlayTarget.UgcPage(currentVideoItem, nextPage)
+            }
+        }
+
+        // 逻辑 B: 如果没有分 P，检查是否有下一个视频
+        if (nextTarget == null && videoListIndex + 1 < videoList.size) {
+            val nextVideo = videoList[videoListIndex + 1]
+            nextTarget = NextPlayTarget.VideoItem(nextVideo)
+        }
+
+        _uiState.update {
+            it.copy(
+                nextVideoTitle = nextTarget?.title ?: "",
+                nextVideoCover = nextTarget?.cover
+            )
+        }
+    }
+
     fun cancelPlayNext() {
         playNextCountdownJob?.cancel()
-        _uiState.update { it.copy(showSkipToNextEp = false, playNextCountdown = -1, nextVideoTitle = "") }
+        _uiState.update {
+            it.copy(
+                showSkipToNextEp = false,
+                playNextCountdown = -1,
+                nextVideoTitle = "",
+                showNextVideoPreview = false,
+                nextVideoCover = null
+            )
+        }
     }
 
     fun backToStart() {
@@ -646,7 +691,12 @@ class VideoPlayerV3ViewModel(
                 launch { loadDanmaku(targetCid) }
                 launch { updateDanmakuMask() }
                 launch { updateVideoShot() }
-                launch { updateVideoPages() }
+                launch {
+                    updateVideoPages()
+                    withContext(Dispatchers.Main) {
+                        calculateNextPlayTarget()
+                    }
+                }
             } catch (e: CancellationException) {
                 throw e // 让结构化并发正常取消，不作为播放错误处理
             } catch (e: Exception) {
@@ -1204,7 +1254,15 @@ class VideoPlayerV3ViewModel(
                 _uiState.update { it.copy(playNextCountdown = i) }
                 delay(1000)
             }
-            _uiState.update { it.copy(playNextCountdown = -1, showSkipToNextEp = false, nextVideoTitle = "") }
+            _uiState.update {
+                it.copy(
+                    playNextCountdown = -1,
+                    showSkipToNextEp = false,
+                    nextVideoTitle = "",
+                    showNextVideoPreview = false,
+                    nextVideoCover = null
+                )
+            }
             playNextTarget(target)
         }
     }
@@ -1289,6 +1347,17 @@ class VideoPlayerV3ViewModel(
                 debugInfo = player.debugInfo
             )
         }
+
+        val isPlaying = _uiState.value.playerState == PlayerState.Playing
+        if (isPlaying && duration > 0 && duration - currentPos <= 10000 && _uiState.value.nextVideoTitle.isNotEmpty()) {
+            if (!_uiState.value.showNextVideoPreview) {
+                _uiState.update { it.copy(showNextVideoPreview = true) }
+            }
+        } else {
+            if (_uiState.value.showNextVideoPreview && _uiState.value.playNextCountdown <= 0) {
+                _uiState.update { it.copy(showNextVideoPreview = false) }
+            }
+        }
     }
 
     private fun startClockUpdater() {
@@ -1345,13 +1414,16 @@ class VideoPlayerV3ViewModel(
 
     private sealed interface NextPlayTarget {
         val title: String
+        val cover: String?
 
         data class UgcPage(val parentVideo: VideoListItem, val page: VideoPage) : NextPlayTarget {
             override val title: String = page.title
+            override val cover: String? = parentVideo.cover
         }
 
         data class VideoItem(val video: VideoListItem) : NextPlayTarget {
             override val title: String = video.title
+            override val cover: String? = video.cover
         }
     }
 

@@ -131,7 +131,8 @@ fun DynamicsScreen(
                             danmakuString = item.danmaku.takeIf { it != -1 }.toWanString(),
                             upName = item.author,
                             timeString = (item.duration * 1000L).formatHourMinSec(),
-                            pubTime = item.pubTime
+                            pubTime = item.pubTime,
+                            badge = item.badge
                         )
                     },
                     onClick = { onClickVideo(item) },
