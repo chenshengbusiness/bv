@@ -124,7 +124,7 @@ class DynamicViewModel(
                 title = it.title,
                 cover = it.cover
             )
-        }.reversed()
+        }
         videoInfoRepository.updateVideoList(videoListItems)
         videoInfoRepository.isTodayUpdatePlayMode = true
     }

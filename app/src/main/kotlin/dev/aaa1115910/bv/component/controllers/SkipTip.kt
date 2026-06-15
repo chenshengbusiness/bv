@@ -62,11 +62,11 @@ fun SkipTips(
                 icon = Icons.Outlined.Info,
             )
             val skipText = buildString {
-                append("即将播放下一集")
+                append("即将播放")
                 if (nextVideoTitle.isNotEmpty()) {
                     append("：$nextVideoTitle")
                 }
-                if (playNextCountdown > 0) {
+                if (playNextCountdown in 1..3) {
                     append(" (${playNextCountdown}s)")
                 }
             }

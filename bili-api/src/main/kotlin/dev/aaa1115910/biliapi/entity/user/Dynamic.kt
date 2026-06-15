@@ -71,6 +71,8 @@ data class DynamicVideo(
         fun fromDynamicVideoItem(item: dev.aaa1115910.biliapi.http.entity.dynamic.DynamicItem): DynamicVideo {
             val archive = item.modules.moduleDynamic.major!!.archive!!
             val author = item.modules.moduleAuthor
+            val badgeText = archive.badge?.text
+            val filteredBadge = if (badgeText == "动态视频" || badgeText == "动态") null else badgeText
             return DynamicVideo(
                 aid = archive.aid.toLong(),
                 bvid = archive.bvid,
@@ -84,7 +86,7 @@ data class DynamicVideo(
                 play = convertStringPlayCountToNumberPlayCount(archive.stat.play),
                 danmaku = convertStringPlayCountToNumberPlayCount(archive.stat.danmaku),
                 pubTime = author.pubTime,
-                badge = archive.badge?.text
+                badge = filteredBadge
             )
         }
 

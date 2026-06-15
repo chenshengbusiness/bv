@@ -221,7 +221,7 @@ fun ControllerVideoInfoBottom(
         if (show) {
             delay(50)
             try {
-                seekFocusRequester.requestFocus()
+                buttonsFocusRequester.requestFocus()
             } catch (e: IllegalStateException) {
                 Log.d("ControllerVideoInfo", "requestFocus failed")
             }
