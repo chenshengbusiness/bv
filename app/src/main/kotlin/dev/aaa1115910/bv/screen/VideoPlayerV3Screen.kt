@@ -57,6 +57,7 @@ fun VideoPlayerV3Screen(
     var currentDanmakuMaskFrame: DanmakuMaskFrame? by remember { mutableStateOf(null) }
 
     var isLooping by remember { mutableStateOf(false) }
+    var showPersistentSeek by remember { mutableStateOf(Prefs.showPersistentSeek) }
     val uiState by playerViewModel.uiState.collectAsState()
     val seekerState = playerViewModel.seekerState.collectAsState()
 
@@ -160,6 +161,12 @@ fun VideoPlayerV3Screen(
             playerViewModel.trySendHeartbeat()
             playerViewModel.playNewVideo(it)
         },
+        onPlayPrevious = {
+            playerViewModel.playPreviousNow()
+        },
+        onPlayNext = {
+            playerViewModel.playNextNow()
+        },
         onCancelSkipToNextEp = {
             playerViewModel.cancelPlayNext()
         },
@@ -169,6 +176,13 @@ fun VideoPlayerV3Screen(
         },
         onToggleLoop = {
             isLooping = !isLooping
+        },
+        onToggleSubtitle = {
+            playerViewModel.toggleSubtitle()
+        },
+        onTogglePersistentSeek = {
+            showPersistentSeek = !showPersistentSeek
+            Prefs.showPersistentSeek = showPersistentSeek
         },
         onGoToUpPage = {
             UpInfoActivity.actionStart(
@@ -251,7 +265,7 @@ fun VideoPlayerV3Screen(
                     ),
                 danmakuPlayer = danmakuPlayer
             )
-            if (Prefs.showPersistentSeek) {
+            if (showPersistentSeek) {
                 VideoProgressSeek(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
