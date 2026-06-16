@@ -143,8 +143,8 @@ android {
             (this as ApkVariantOutputImpl).apply {
                 val date = SimpleDateFormat("yyyyMMdd").format(Date())
                 val branchName = try {
-                    java.lang.ProcessBuilder("git", "rev-parse", "--abbrev-ref", "HEAD")
-                        .start().inputStream.bufferedReader().use { it.readText().trim() }
+                    val process = ProcessBuilder("git", "rev-parse", "--abbrev-ref", "HEAD").start()
+                    process.inputStream.bufferedReader().use { it.readLine()?.trim() ?: "unknown" }
                 } catch (e: Exception) { "unknown" }
                 outputFileName = "BV_${date}_${branchName}.apk"
                 versionNameOverride =
