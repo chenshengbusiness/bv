@@ -142,12 +142,11 @@ android {
         outputs.configureEach {
             (this as ApkVariantOutputImpl).apply {
                 val date = SimpleDateFormat("yyyyMMdd").format(Date())
-                if (variant.buildType.name == "release" && variant.flavorName == "default") {
-                    outputFileName = "BV_${date}.apk"
-                } else {
-                    val abi = this.filters.find { it.filterType == "ABI" }?.identifier ?: "universal"
-                    outputFileName = "BV_${date}_${variant.buildType.name}_${variant.flavorName}_$abi.apk"
-                }
+                val branchName = try {
+                    java.lang.ProcessBuilder("git", "rev-parse", "--abbrev-ref", "HEAD")
+                        .start().inputStream.bufferedReader().use { it.readText().trim() }
+                } catch (e: Exception) { "unknown" }
+                outputFileName = "BV_${date}_${branchName}.apk"
                 versionNameOverride =
                     "${variant.versionName}.${variant.buildType.name}"
             }
