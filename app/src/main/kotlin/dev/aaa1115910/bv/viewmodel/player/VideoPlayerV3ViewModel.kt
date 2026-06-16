@@ -698,7 +698,7 @@ class VideoPlayerV3ViewModel(
                 launch { updateVideoShot() }
                 launch {
                     updateVideoPages()
-                    if (Prefs.enablePlayNextEpisodeAuto) {
+                    if (Prefs.actionAfterPlay == ActionAfterPlayItems.PlayNext) {
                         updateNextVideoPreview()
                     }
                 }
