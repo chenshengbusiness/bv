@@ -60,6 +60,7 @@ class VideoShotImageCache {
         val bitmapOptions = BitmapFactory.Options().apply {
             inPreferredConfig = Bitmap.Config.RGB_565
             inScaled = false
+            inSampleSize = 2
         }
     }
 

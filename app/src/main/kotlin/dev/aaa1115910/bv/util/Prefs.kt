@@ -204,6 +204,16 @@ object Prefs {
     var showPersistentSeek by pref(PrefKeys.prefShowPersistentSeekKey, false)
 
     // =========================================================================
+    // 播放器 - 极致优化 (Advanced)
+    // =========================================================================
+
+    var enableDynamicLoadControl by pref(PrefKeys.prefEnableDynamicLoadControlKey, true)
+    var enableTunneling by pref(PrefKeys.prefEnableTunnelingKey, true)
+    var enableMediaCodecHighPriority by pref(PrefKeys.prefEnableMediaCodecHighPriorityKey, true)
+    var enableSmartGcBeforePlay by pref(PrefKeys.prefEnableSmartGcBeforePlayKey, true)
+    var enableSmartHighestQuality by pref(PrefKeys.prefEnableSmartHighestQualityKey, true)
+
+    // =========================================================================
     // 应用界面
     // =========================================================================
 
@@ -372,6 +382,13 @@ private object PrefKeys {
     val prefShowFpsKey = booleanPreferencesKey("sf")
     val prefShowVideoInfoKey = booleanPreferencesKey("show_video_info")
     val prefShowPersistentSeekKey = booleanPreferencesKey("show_persistent_seek")
+
+    // 播放器 - 极致优化 (Advanced)
+    val prefEnableDynamicLoadControlKey = booleanPreferencesKey("enable_dynamic_load_control")
+    val prefEnableTunnelingKey = booleanPreferencesKey("enable_tunneling")
+    val prefEnableMediaCodecHighPriorityKey = booleanPreferencesKey("enable_media_codec_high_priority")
+    val prefEnableSmartGcBeforePlayKey = booleanPreferencesKey("enable_smart_gc_before_play")
+    val prefEnableSmartHighestQualityKey = booleanPreferencesKey("enable_smart_highest_quality")
 
     // 应用界面
     val prefDensityKey = floatPreferencesKey("density")

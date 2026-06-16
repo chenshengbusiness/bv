@@ -69,9 +69,31 @@ class ExoMediaPlayer(
                 setMediaCodecSelector(MediaCodecSelector.DEFAULT)
             }
         }
+        val trackSelector = androidx.media3.exoplayer.trackselection.DefaultTrackSelector(context)
+        if (options.enableTunneling) {
+            trackSelector.setParameters(
+                trackSelector.buildUponParameters().setTunnelingEnabled(true)
+            )
+        }
+
+        val loadControl = if (options.enableDynamicLoadControl) {
+            androidx.media3.exoplayer.DefaultLoadControl.Builder()
+                .setBufferDurationsMs(
+                    120000,
+                    120000,
+                    2500,
+                    5000
+                )
+                .build()
+        } else {
+            androidx.media3.exoplayer.DefaultLoadControl()
+        }
+
         mPlayer = ExoPlayer
             .Builder(context)
             .setRenderersFactory(renderersFactory)
+            .setTrackSelector(trackSelector)
+            .setLoadControl(loadControl)
             .setSeekForwardIncrementMs(1000 * 10)
             .setSeekBackIncrementMs(1000 * 5)
             .build()

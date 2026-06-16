@@ -49,11 +49,16 @@ fun PlayStateTips(
         modifier = modifier.fillMaxSize()
     ) {
         if (!isPlaying && !isBuffering && !isError) {
-            PauseIcon(
+            Row(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(24.dp)
-            )
+                    .padding(24.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                OptimizationStatusQrCode()
+                PauseIcon()
+            }
         }
         if (isBuffering && !isError) {
             BufferingTip(
@@ -67,6 +72,55 @@ fun PlayStateTips(
                 modifier = Modifier.align(Alignment.Center),
                 errorMessage = errorMessage
             )
+        }
+    }
+}
+
+@Composable
+fun OptimizationStatusQrCode() {
+    val info = remember {
+        """
+        === 极致优化状态 ===
+        Smart GC: ${dev.aaa1115910.bv.util.Prefs.enableSmartGcBeforePlay}
+        Smart Quality: ${dev.aaa1115910.bv.util.Prefs.enableSmartHighestQuality}
+        Dynamic LoadControl: ${dev.aaa1115910.bv.util.Prefs.enableDynamicLoadControl}
+        Tunneling: ${dev.aaa1115910.bv.util.Prefs.enableTunneling}
+        High Priority: ${dev.aaa1115910.bv.util.Prefs.enableMediaCodecHighPriority}
+        """.trimIndent()
+    }
+    
+    val qrImage = remember(info) {
+        try {
+            val output = ByteArrayOutputStream()
+            QRCode(info).render(margin = 2).writeImage(output)
+            val input = ByteArrayInputStream(output.toByteArray())
+            BitmapFactory.decodeStream(input).asImageBitmap()
+        } catch (e: Exception) {
+            null
+        }
+    }
+    
+    qrImage?.let {
+        Surface(
+            colors = SurfaceDefaults.colors(containerColor = Color.Black.copy(0.5f)),
+            shape = MaterialTheme.shapes.medium
+        ) {
+            Row(
+                modifier = Modifier.padding(12.dp, 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "扫码查看优化状态",
+                    color = Color.White,
+                    fontSize = 12.sp
+                )
+                Image(
+                    bitmap = it,
+                    contentDescription = "Optimization Info QR",
+                    modifier = Modifier.size(42.dp).clip(MaterialTheme.shapes.extraSmall)
+                )
+            }
         }
     }
 }

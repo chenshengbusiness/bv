@@ -108,6 +108,8 @@ class VideoPlayerV3ViewModel(
 
     private var seekerUpdateJob: Job? = null
     private var clockUpdateJob: Job? = null
+
+    private var lastGcTimeMs = 0L
     private var heartbeatJob: Job? = null
     private var loadVideoJob: Job? = null
 
@@ -256,6 +258,24 @@ class VideoPlayerV3ViewModel(
     }
 
     fun initVideoPlayer(context: Context) {
+        if (Prefs.enableSmartGcBeforePlay) {
+            val runtime = java.lang.Runtime.getRuntime()
+            val totalMemory = runtime.totalMemory()
+            val freeMemory = runtime.freeMemory()
+            val maxMemory = runtime.maxMemory()
+            
+            val usage = (totalMemory - freeMemory).toDouble() / maxMemory
+            val freeMB = freeMemory / 1024 / 1024
+            val shouldGc = usage > 0.7 || (freeMB < 200 && usage > 0.6)
+            val now = System.currentTimeMillis()
+            
+            if (shouldGc && (now - lastGcTimeMs > 30_000)) {
+                logger.info { "SmartGC triggered: usage=${"%.2f".format(usage)}, freeMB=$freeMB" }
+                System.gc()
+                lastGcTimeMs = now
+            }
+        }
+
         logger.info { "Init video player: ${Prefs.playerType.name}" }
 
         val options = VideoPlayerOptions(
@@ -268,7 +288,10 @@ class VideoPlayerV3ViewModel(
                 ApiType.App -> null
             },
             enableFfmpegAudioRenderer = Prefs.enableFfmpegAudioRenderer,
-            enableSoftwareVideoDecoder = Prefs.enableSoftwareVideoDecoder
+            enableSoftwareVideoDecoder = Prefs.enableSoftwareVideoDecoder,
+            enableDynamicLoadControl = Prefs.enableDynamicLoadControl,
+            enableTunneling = Prefs.enableTunneling,
+            enableMediaCodecHighPriority = Prefs.enableMediaCodecHighPriority
         )
 
         val newVideoPlayer = when (Prefs.playerType) {
@@ -831,6 +854,10 @@ class VideoPlayerV3ViewModel(
     }
 
     private fun calculateTargetQuality(availableQualities: Set<Int>, defaultQualityCode: Int): Int {
+        if (Prefs.enableSmartHighestQuality) {
+            return availableQualities.sorted().lastOrNull() ?: 0
+        }
+
         if (availableQualities.contains(defaultQualityCode)) return defaultQualityCode
 
         val sortedQualities = availableQualities.sorted()
