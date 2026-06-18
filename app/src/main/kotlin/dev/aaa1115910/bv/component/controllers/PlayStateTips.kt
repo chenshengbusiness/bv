@@ -56,7 +56,6 @@ fun PlayStateTips(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.Bottom
             ) {
-                OptimizationStatusQrCode()
                 PauseIcon()
             }
         }

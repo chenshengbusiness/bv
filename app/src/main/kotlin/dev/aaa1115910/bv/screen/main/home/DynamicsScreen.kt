@@ -132,7 +132,7 @@ fun DynamicsScreen(
                             upName = item.author,
                             timeString = (item.duration * 1000L).formatHourMinSec(),
                             pubTime = item.pubTime,
-                            badge = item.badge
+                            badge = if (item.badge == "充电视频") item.badge else null
                         )
                     },
                     onClick = { onClickVideo(item) },

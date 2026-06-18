@@ -6,4 +6,4 @@
 
 # 编译打包规范
 
-- 当用户要求打 APK 安装包或测试包时，永远只打正式发布包（执行 `assembleRelease` 等 Release 相关指令），严禁打 Debug 包。这有助于减小 APK 体积并测试最终的混淆效果。
+- 当用户要求打 APK 安装包或测试包时，永远只打默认的正式发布包（执行 `assembleDefaultRelease` 等相关指令），严禁打 Debug 包，也绝对不要打 Lite 包。这有助于减小 APK 体积并避免浪费时间编译不需要的版本。

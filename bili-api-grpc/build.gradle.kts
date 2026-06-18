@@ -1,7 +1,7 @@
 import com.google.protobuf.gradle.proto
 
 plugins {
-    //id("java-library")
+    id("java-library")
     alias(gradleLibs.plugins.google.protobuf)
     alias(gradleLibs.plugins.kotlin.jvm)
 }
@@ -11,6 +11,7 @@ dependencies {
     api(libs.grpc.okhttp)
     api(libs.grpc.protobuf)
     api(libs.grpc.stub)
+    api("com.google.protobuf:protobuf-java:${libs.versions.protobuf.get()}")
     api(libs.protobuf.kotlin)
     implementation(libs.kotlinx.coroutines)
 }
