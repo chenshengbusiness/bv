@@ -136,7 +136,13 @@ fun VideoPlayerController(
         }
     }
 
+    var wasPlayingBeforeSeek by remember { mutableStateOf(false) }
+
     fun onTimeForward() {
+        if (!isSeeking) {
+            wasPlayingBeforeSeek = isPlaying
+            if (isPlaying) onPause()
+        }
         isSeeking = true
         val targetTime = goTime + (10000 + calCoefficient() * 5000)
         goTime =
@@ -146,6 +152,10 @@ fun VideoPlayerController(
     }
 
     fun onTimeBack() {
+        if (!isSeeking) {
+            wasPlayingBeforeSeek = isPlaying
+            if (isPlaying) onPause()
+        }
         isSeeking = true
         val targetTime = goTime - (10000 + calCoefficient() * 5000)
         goTime = if (targetTime < 0) 0 else targetTime
@@ -159,7 +169,7 @@ fun VideoPlayerController(
             delay(1000)
 
             onGoTime(goTime)
-            if (!isPlaying) onPlay()
+            if (wasPlayingBeforeSeek) onPlay()
 
             isSeeking = false
             showInfoSeekController = false
@@ -182,7 +192,7 @@ fun VideoPlayerController(
     fun onSeekGoTime() {
         onGoTime(goTime)
         isSeeking = false
-        if (!isPlaying) onPlay()
+        if (wasPlayingBeforeSeek) onPlay()
         showInfoSeekController = false
         seekCountdown?.cancel()
     }

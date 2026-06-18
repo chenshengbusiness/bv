@@ -97,6 +97,7 @@ class ExoMediaPlayer(
             .setSeekForwardIncrementMs(1000 * 10)
             .setSeekBackIncrementMs(1000 * 5)
             .build()
+        mPlayer.setSeekParameters(androidx.media3.exoplayer.SeekParameters.CLOSEST_SYNC)
 
         initListener()
     }
